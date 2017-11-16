@@ -2,8 +2,15 @@
 #include "mainwindow.h"
 #include "view.h"
 
+#include "itkImage.h"
+#include "itkImageFileReader.h"
+#include "itkImageRegionIteratorWithIndex.h"
+
 #include <QHBoxLayout>
 #include <QSplitter>
+#include <QImage>
+
+#include <iterator>
 
 MainWindow::MainWindow(QWidget *parent)
 : QWidget(parent)
@@ -18,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     vSplitter->addWidget(h1Splitter);
     vSplitter->addWidget(h2Splitter);*/
     
-    View *view = new View("Top left view");
+    View *view = new View("Projet Master 2");
     view->view()->setScene(scene);
     //h1Splitter->addWidget(view);
     
@@ -39,14 +46,52 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(view);
     setLayout(layout);
     
-    setWindowTitle(tr("Projet"));
+    setWindowTitle(tr("Projet Synthese Master 2"));
 }
 
 void MainWindow::populateScene()
 {
     scene = new QGraphicsScene(this);
     
-    QImage image(":/qt4logo.png");
+    typedef itk::RGBPixel< unsigned char > RGBPixelType;
+    typedef itk::Image< RGBPixelType, 2 > ImageType;
+    typedef itk::ImageFileReader<ImageType> ReaderType;
+
+    ReaderType::Pointer reader = ReaderType::New();
+    std::string fileName;
+    std::cout << "Image : " << std::endl;
+    std::cin >> fileName;
+    reader->SetFileName(fileName);
+    reader->Update();
+
+    // Dimensions de l'image
+    int h=300 , w=233;
+
+    QImage myQtImage(h,w,QImage::Format_RGB32);
+
+    ImageType::Pointer myITKImage = reader->GetOutput();
+    itk::ImageRegionIteratorWithIndex<ImageType> it(myITKImage,myITKImage->GetLargestPossibleRegion().GetSize());
+
+    std::cout << "myITKImage->GetLargestPossibleRegion().GetSize() : " << myITKImage->GetLargestPossibleRegion().GetSize() << std::endl;
+
+    it.GoToBegin();
+
+    for (unsigned int j=0;j<w;j++)
+    {
+      for (unsigned int i=0;i<h;i++)
+      {
+        RGBPixelType v = it.Get();
+        unsigned int qvalue = 0;
+        unsigned int r = v.GetRed();
+        unsigned int b = v.GetBlue();
+        unsigned int g = v.GetGreen();
+        qvalue = r + (g << 8) + (b << 16);
+        myQtImage.setPixel(i,j,qvalue);
+        std::cout << it.Get() << std::endl;
+        std::cout << myQtImage.pixel(i,j) << std::endl;
+        ++it;
+      }
+    }
     
     // Populate scene
     int xx = 0;
@@ -59,7 +104,7 @@ void MainWindow::populateScene()
             qreal x = (i + 11000) / 22000.0;
             qreal y = (j + 7000) / 14000.0;
             
-            QColor color(image.pixel(int(image.width() * x), int(image.height() * y)));
+            QColor color(myQtImage.pixel(int(myQtImage.width() * x), int(myQtImage.height() * y)));
             QGraphicsItem *item = new Chip(color, xx, yy);
             item->setPos(QPointF(i, j));
             scene->addItem(item);
@@ -69,22 +114,3 @@ void MainWindow::populateScene()
     }
 }
 
-
-/*#include "mainwindow.h"
-#include "view.h"
-
-#include <QHBoxLayout>
-#include <QSplitter>
-
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
-{
-    setWindowTitle(tr("Projet M2"));
-}
-
-
-
-void MainWindow::populateScene()
-{
- 
-}*/
