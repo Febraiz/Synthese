@@ -58,19 +58,24 @@ void MainWindow::populateScene()
     typedef itk::ImageFileReader<ImageType> ReaderType;
 
     ReaderType::Pointer reader = ReaderType::New();
+    //reader->SetFileName(":/qt4logo.png");
     std::string fileName;
     std::cout << "Image : " << std::endl;
     std::cin >> fileName;
     reader->SetFileName(fileName);
     reader->Update();
 
-    // Dimensions de l'image
-    int h=300 , w=233;
+    ImageType::Pointer myITKImage = reader->GetOutput();
+
+    ImageType::RegionType region = myITKImage->GetLargestPossibleRegion();
+
+    ImageType::SizeType size = region.GetSize();
+
+    int h=size[0] , w=size[1];
 
     QImage myQtImage(h,w,QImage::Format_RGB32);
 
-    ImageType::Pointer myITKImage = reader->GetOutput();
-    itk::ImageRegionIteratorWithIndex<ImageType> it(myITKImage,myITKImage->GetLargestPossibleRegion().GetSize());
+    itk::ImageRegionIteratorWithIndex<ImageType> it(myITKImage,size);
 
     std::cout << "myITKImage->GetLargestPossibleRegion().GetSize() : " << myITKImage->GetLargestPossibleRegion().GetSize() << std::endl;
 
