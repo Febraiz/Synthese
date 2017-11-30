@@ -105,13 +105,13 @@ void MainWindow::populateScene()
     // Populate scene
     int xx = 0;
     int nitems = 0;
-    for (int i = -11000; i < 11000; i += 110) {
+    for (int i = -10000; i < 10000; i += 100) {
         ++xx;
         int yy = 0;
-        for (int j = -7000; j < 7000; j += 70) {
+        for (int j = -10000; j < 10000; j += 100) {
             ++yy;
-            qreal x = (i + 11000) / 22000.0;
-            qreal y = (j + 7000) / 14000.0;
+            qreal x = (i + 10000) / 20000.0;
+            qreal y = (j + 10000) / 20000.0;
             
             QColor color(myQtImage.pixel(int(myQtImage.width() * x), int(myQtImage.height() * y)));
             QGraphicsItem *item = new Chip(color, xx, yy);
@@ -121,5 +121,6 @@ void MainWindow::populateScene()
             ++nitems;
         }
     }
+    std::cout << "Nombre de pixels : " << nitems << std::endl;
 }
 

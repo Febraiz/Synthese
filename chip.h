@@ -7,6 +7,10 @@
 class Chip : public QGraphicsItem
 {
 public:
+
+    static int width;
+    static int height;
+
     Chip(const QColor &color, int x, int y);
 
     QRectF boundingRect() const override;
