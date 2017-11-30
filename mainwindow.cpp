@@ -88,12 +88,16 @@ void MainWindow::populateScene()
         RGBPixelType v = it.Get();
         unsigned int qvalue = 0;
         unsigned int r = v.GetRed();
-        unsigned int b = v.GetBlue();
         unsigned int g = v.GetGreen();
-        qvalue = r + (g << 8) + (b << 16);
+        unsigned int b = v.GetBlue();
+        /*std::cout<< "Rouge : "<< r << std::endl;
+        std::cout<< "Vert : "<< g << std::endl;
+        std::cout<< "Bleu : "<< b << std::endl;*/
+        qvalue = (r << 16) + (g << 8) + b;
+        //std::cout << qvalue << std::endl;
         myQtImage.setPixel(i,j,qvalue);
-        std::cout << it.Get() << std::endl;
-        std::cout << myQtImage.pixel(i,j) << std::endl;
+        //std::cout << it.Get() << std::endl;
+        //std::cout << myQtImage.pixel(i,j) << std::endl;
         ++it;
       }
     }
